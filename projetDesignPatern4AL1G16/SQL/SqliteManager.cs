@@ -59,5 +59,13 @@ namespace projetDesignPatern4AL1G16
             command.Dispose();
             
         }
+
+        public IEnumerable<string> GetAllContactNames()
+        {
+            foreach (DataRow row in ReadData("SELECT firstname, lastname FROM contact").Tables[0].Rows )
+            {
+                yield return row["firstname"].ToString() +' '+ row["lastname"].ToString();
+            }
+        }
     }
 }

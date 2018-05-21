@@ -1,4 +1,6 @@
-﻿namespace projetDesignPatern4AL1G16
+﻿using System.Windows.Forms;
+
+namespace projetDesignPatern4AL1G16
 {
     partial class MainWindow 
     {
@@ -6,8 +8,9 @@
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-        private SqliteManager SQL=new SqliteManager(); 
-
+        private SqliteManager SQL=new SqliteManager();
+        private int nbContactDisplayed=0;
+        private int spaceBetweenContacts = 35;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -32,15 +35,16 @@
         {
             this.SuspendLayout();
             // 
-            // Form1
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Name = "Form1";
+            this.Name = "MainWindow";
             this.Text = "Form1";
+            this.Shown += new System.EventHandler(this.MainWindow_Shown);
             this.ResumeLayout(false);
- 
+
         }
 
         #endregion
