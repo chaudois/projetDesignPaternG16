@@ -14,7 +14,6 @@ namespace WinForm
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            SQL.Dispose();
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -38,15 +37,16 @@ namespace WinForm
             this.mainPanel.AutoScroll = true;
             this.mainPanel.Location = new System.Drawing.Point(12, 12);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Size = new System.Drawing.Size(776, 426);
+            this.mainPanel.Size = new System.Drawing.Size(776, 576);
             this.mainPanel.TabIndex = 0;
+
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 600);
             this.Controls.Add(this.mainPanel);
             this.Name = "MainWindow";
             this.Text = "Form1";

@@ -14,10 +14,10 @@ namespace DAL
             using (SqliteManager sql = new SqliteManager())
             {
                 sql.ExecQuery("insert into contact (firstname,lastname,adresse,mail,phonenum) values (" +
-                    "'" + entity.firstName + "'" +
-                    "'" + entity.lastName + "'" +
-                    "'" + entity.adresse + "'" +
-                    "'" + entity.mail + "'" +
+                    "'" + entity.firstName + "'," +
+                    "'" + entity.lastName + "'," +
+                    "'" + entity.adresse + "'," +
+                    "'" + entity.mail + "'," +
                     "'" + entity.phoneNum + "');");
             }
         }
@@ -66,7 +66,10 @@ namespace DAL
 
         public void remove(int id)
         {
-            throw new NotImplementedException();
+            using (SqliteManager sql = new SqliteManager())
+            {
+                sql.ExecQuery("delete from contact where id=" + id + ";");
+            }
         }
 
         public void update(ContactDTO entity)

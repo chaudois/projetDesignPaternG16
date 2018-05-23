@@ -37,7 +37,6 @@ namespace DAL
             connection.Open();
             command = connection.CreateCommand();
             command.CommandText = query;
-            command.ExecuteNonQuery();
             adapter = new SQLiteDataAdapter(query, connection);
             dataSet.Reset();
             adapter.Fill(dataSet);
