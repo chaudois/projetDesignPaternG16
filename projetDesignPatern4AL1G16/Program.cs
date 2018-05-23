@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace projetDesignPatern4AL1G16
+namespace WinForm
 {
     static class Program
     {

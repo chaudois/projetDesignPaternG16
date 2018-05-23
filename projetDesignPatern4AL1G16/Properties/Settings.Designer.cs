@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace projetDesignPatern4AL1G16.Properties
+namespace WinForm.Properties
 {
 
 

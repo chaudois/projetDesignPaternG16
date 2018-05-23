@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace projetDesignPatern4AL1G16
+namespace DAL
 {
     public class SqliteManager :IDisposable
     {
@@ -17,7 +17,7 @@ namespace projetDesignPatern4AL1G16
         private DataSet dataSet=new DataSet();
         public SqliteManager()
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo("../../SQL/Tables");
+            DirectoryInfo directoryInfo = new DirectoryInfo("../../../DAL/Tables");
             foreach (var item in directoryInfo.GetFiles())
             {
                 using (StreamReader sr = item.OpenText())
@@ -32,7 +32,7 @@ namespace projetDesignPatern4AL1G16
             }
              
          }
-        public DataSet ReadData(string query)
+        public DataSet ExecQuery(string query)
         {
             connection.Open();
             command = connection.CreateCommand();
@@ -44,14 +44,7 @@ namespace projetDesignPatern4AL1G16
             connection.Close();
             return dataSet;
         }
-        public void ExecQuery(string query)
-        {
-            connection.Open();
-            command = connection.CreateCommand();
-            command.CommandText = query;
-            command.ExecuteNonQuery();
-            connection.Close();
-        }
+        
 
         public void Dispose()
         {
@@ -59,13 +52,6 @@ namespace projetDesignPatern4AL1G16
             command.Dispose();
             
         }
-
-        public IEnumerable<string> GetAllContactNames()
-        {
-            foreach (DataRow row in ReadData("SELECT firstname, lastname FROM contact").Tables[0].Rows )
-            {
-                yield return row["firstname"].ToString() +' '+ row["lastname"].ToString();
-            }
-        }
+         
     }
 }

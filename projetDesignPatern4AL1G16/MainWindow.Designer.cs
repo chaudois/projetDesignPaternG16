@@ -1,16 +1,13 @@
 ﻿using System.Windows.Forms;
 
-namespace projetDesignPatern4AL1G16
+namespace WinForm
 {
-    partial class MainWindow 
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-        private SqliteManager SQL=new SqliteManager();
-        private int nbContactDisplayed=0;
-        private int spaceBetweenContacts = 35;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -33,13 +30,24 @@ namespace projetDesignPatern4AL1G16
         /// </summary>
         private void InitializeComponent()
         {
+            this.mainPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.SuspendLayout();
+            // 
+            // mainPanel
+            // 
+            this.mainPanel.AutoScroll = true;
+            this.mainPanel.Location = new System.Drawing.Point(12, 12);
+            this.mainPanel.Name = "mainPanel";
+            this.mainPanel.Size = new System.Drawing.Size(776, 426);
+            this.mainPanel.TabIndex = 0;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.mainPanel);
             this.Name = "MainWindow";
             this.Text = "Form1";
             this.Shown += new System.EventHandler(this.MainWindow_Shown);
@@ -48,6 +56,8 @@ namespace projetDesignPatern4AL1G16
         }
 
         #endregion
+
+        private FlowLayoutPanel mainPanel;
     }
 }
 
