@@ -30,6 +30,7 @@ namespace WinForm
         private void InitializeComponent()
         {
             this.mainPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.InfoPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.SuspendLayout();
             // 
             // mainPanel
@@ -37,16 +38,23 @@ namespace WinForm
             this.mainPanel.AutoScroll = true;
             this.mainPanel.Location = new System.Drawing.Point(12, 12);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Size = new System.Drawing.Size(776, 576);
+            this.mainPanel.Size = new System.Drawing.Size(634, 576);
             this.mainPanel.TabIndex = 0;
-
+            // 
+            // InfoPanel
+            // 
+            this.InfoPanel.Location = new System.Drawing.Point(652, 12);
+            this.InfoPanel.Name = "InfoPanel";
+            this.InfoPanel.Size = new System.Drawing.Size(379, 576);
+            this.InfoPanel.TabIndex = 1;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.ClientSize = new System.Drawing.Size(1043, 600);
+            this.Controls.Add(this.InfoPanel);
             this.Controls.Add(this.mainPanel);
             this.Name = "MainWindow";
             this.Text = "Form1";
@@ -58,6 +66,7 @@ namespace WinForm
         #endregion
 
         private FlowLayoutPanel mainPanel;
+        private FlowLayoutPanel InfoPanel;
     }
 }
 

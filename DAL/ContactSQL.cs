@@ -74,7 +74,15 @@ namespace DAL
 
         public void update(ContactDTO entity)
         {
-            throw new NotImplementedException();
+             using (SqliteManager sql = new SqliteManager())
+            {
+                sql.ExecQuery("update  contact set firstname='" + entity.firstName + "'"+
+                    ",lastname='" + entity.lastName + "'" +
+                    ",adresse='" + entity.adresse + "'" +
+                    ",mail='" + entity.mail + "'" +
+                    ",phonenum='" + entity.phoneNum + "'" +
+                    " where id=" + entity.id + ";");
+            }
         }
     }
 }
