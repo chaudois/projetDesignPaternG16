@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
 using DAL;
 using DTO;
@@ -14,8 +12,8 @@ namespace WinForm
 
 
         ContactSQL contactSQL = new ContactSQL();
-        private int nbControlsAddedMainPanel = 0;
-        private int nbControlsAddedInfoPanel = 0;
+        int nbControlsAddedMainPanel = 0;
+        int nbControlsAddedInfoPanel = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -23,13 +21,16 @@ namespace WinForm
 
         private void MainWindow_Shown(object sender, EventArgs e)
         {
-            AddContactListToView();
+            DisplayMain();
         }
-        private void AddContactListToView()
+        /// <summary>
+        /// ajoute tout les contact contenues en base au main panel ainsi que le formualire d'ajout
+        /// </summary>
+        private void DisplayMain()
         {
-            IEnumerable<ContactDTO> contacts = contactSQL.GetAll();
+            var contacts = contactSQL.GetAll();
 
-            foreach (var item in contacts)
+            foreach (var item in contacts)//ajoute tout les contact à la fenetre principal
             {
                 Button boutonName = new Button();
                 boutonName.Text = item.firstName + " " + item.lastName;
@@ -58,10 +59,13 @@ namespace WinForm
                 nbControlsAddedMainPanel++;
  
             }
-            FillMainPanel();
+            AddFormToMainPanel();
 
         }
-
+        /// <summary>
+        /// ajoute toutes les textbox au panel info
+        /// </summary>
+        /// <param name="item">contact qui preremplira les textbox et qui sera update à l'appui du bouton</param>
         private void DisplayInfo(ContactDTO item)
         {
             InfoPanel.Controls.Clear();
@@ -96,12 +100,17 @@ namespace WinForm
                 mainPanel.Controls.Clear();
                 InfoPanel.Controls.Clear();
                 DisplayInfo(newContact);
-                AddContactListToView();
+                DisplayMain();
             };
             InfoPanel.Controls.Add(boutonUpdate);
 
 
         }
+        /// <summary>
+        /// creer un textbox avec un placeholder
+        /// </summary>
+        /// <param name="text">text du placeholder</param>
+        /// <returns></returns>
         private TextBox SetupPlaceHolder(string text)
         {
             TextBox textbox = new TextBox();
@@ -129,7 +138,11 @@ namespace WinForm
             };
             return textbox;
         }
-
+        /// <summary>
+        /// creer et ajoute un textbox sur l'infoPanel
+        /// </summary>
+        /// <param name="text">text à afficher sur le textbox</param>
+        /// <returns></returns>
         private TextBox SetupTextBoxInfoPanel(string text)
         {
             TextBox textbox = SetupPlaceHolder(text);
@@ -139,25 +152,36 @@ namespace WinForm
             InfoPanel.SetFlowBreak(textbox, true);
             return textbox;
         }
-
+        /// <summary>
+        /// supprime le contact de la base de donné et du panel
+        /// </summary>
+        /// <param name="item">contact à supprimer</param>
         private void RemoveContact( ContactDTO item)
         {
             contactSQL.remove(item.id);
             mainPanel.Controls.Clear();
             InfoPanel.Controls.Clear();
-            AddContactListToView();
+            DisplayMain();
 
         }
-        private TextBox setupTextBoxMainPanel(string nomBouton)
+        /// <summary>
+        /// creer un textbox et l'insert dans le mainPanel
+        /// </summary>
+        /// <param name="nomTextBox">text à afficher dans le placeholder du textBox</param>
+        /// <returns></returns>
+        private TextBox setupTextBoxMainPanel(string nomTextBox)
         {
-            TextBox textbox = SetupPlaceHolder(nomBouton);
+            TextBox textbox = SetupPlaceHolder(nomTextBox);
             textbox.Location = new Point(0, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
             nbControlsAddedMainPanel++;
             mainPanel.Controls.Add(textbox);
             mainPanel.SetFlowBreak(textbox, true);
             return textbox;
         }
-        private void FillMainPanel()
+        /// <summary>
+        /// ajoute le formulaire d'ajout au mainPanel
+        /// </summary>
+        private void AddFormToMainPanel()
         {
             TextBox textboxFirstName = setupTextBoxMainPanel("FirstName");
             TextBox textboxLastName  = setupTextBoxMainPanel("LastName");
@@ -182,7 +206,7 @@ namespace WinForm
 
                       });
                       mainPanel.Controls.Clear();
-                      AddContactListToView();
+                      DisplayMain();
                   }
               };
             mainPanel.Controls.Add(boutonValider);

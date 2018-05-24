@@ -9,48 +9,41 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class SqliteManager :IDisposable
+    public class SqliteManager : IDisposable
     {
         public SQLiteConnection connection = new SQLiteConnection("Data Source=saveFile.db;Version=3;New=False;Compress=True;");
         private SQLiteCommand command;
         private SQLiteDataAdapter adapter;
-        private DataSet dataSet=new DataSet();
+        private DataSet dataSet = new DataSet();
         public SqliteManager()
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo("../../../DAL/Tables");
-            foreach (var item in directoryInfo.GetFiles())
+            foreach (var key in Data.SQL_CREATE.Keys)
             {
-                using (StreamReader sr = item.OpenText())
-                {
-                    string line = "";
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        ExecQuery(line);
-                    }
-                }
-
+                ExecQuery(Data.SQL_CREATE[key]);
             }
-             
-         }
-        public DataSet ExecQuery(string query)
-        {
-            connection.Open();
-            command = connection.CreateCommand();
-            command.CommandText = query;
-            adapter = new SQLiteDataAdapter(query, connection);
-            dataSet.Reset();
-            adapter.Fill(dataSet);
-            connection.Close();
-            return dataSet;
-        }
-        
 
-        public void Dispose()
-        {
-            connection.Close();
-            command.Dispose();
-            
         }
-         
+    
+    
+    public DataSet ExecQuery(string query)
+    {
+        connection.Open();
+        command = connection.CreateCommand();
+        command.CommandText = query;
+        adapter = new SQLiteDataAdapter(query, connection);
+        dataSet.Reset();
+        adapter.Fill(dataSet);
+        connection.Close();
+        return dataSet;
     }
+
+
+    public void Dispose()
+    {
+        connection.Close();
+        command.Dispose();
+
+    }
+
+}
 }
