@@ -53,7 +53,7 @@ namespace DAL
             var retour = new List<ContactDTO>();
             List<FieldDTO> fieldOfCurrentReturn = new List<FieldDTO>();
 
-            DataTable dt = SqlSingleton.getInstance().ExecQuery("select * from contact  ;").Tables[0];
+            DataTable dt = SqlSingleton.getInstance().ExecQuery("select * from contact  order by firstname,lastname;").Tables[0];
             for (int i=0;i<dt.Rows.Count;i++)
             {
                 retour.Add( new ContactDTO

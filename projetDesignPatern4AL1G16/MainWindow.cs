@@ -46,22 +46,41 @@ namespace WinForm
                 };
                 mainPanel.Controls.Add(boutonName);
 
+                Button boutonClone = new Button();
                 Button boutonRemove = new Button();
 
-                boutonRemove.BackgroundImage = global::projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
+                boutonClone.BackgroundImage = projetDesignPatern4AL1G16.Properties.Resources.arrow_return_left;
+                boutonClone.Size = new Size(new Point(25, 25));
+                boutonClone.BackgroundImageLayout = ImageLayout.Stretch;
+                boutonClone.Click += (s, e) => { CloneContact(item); };
+                boutonClone.Anchor = AnchorStyles.Left;
+
+                boutonRemove.BackgroundImage = projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
                 boutonRemove.Size = new Size(new Point(25, 25));
                 boutonRemove.BackgroundImageLayout = ImageLayout.Stretch;
                 boutonRemove.Click += (s, e) => { RemoveContact(item); };
+                boutonRemove.Anchor = AnchorStyles.Left;
 
-                boutonRemove.Location = new Point(310, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
+                boutonClone.Location = new Point(310, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
+                boutonRemove.Location = new Point(350, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
+
+                mainPanel.Controls.Add(boutonClone);
+                mainPanel.Controls.Add(boutonRemove);
 
                 mainPanel.SetFlowBreak(boutonRemove, true);
-                mainPanel.Controls.Add(boutonRemove);
                 nbControlsAddedMainPanel++;
 
             }
             AddFormToMainPanel();
         }
+
+        private void CloneContact(ContactDTO item)
+        {
+            new ContactSQL().Add((ContactDTO) item.Clone());
+            mainPanel.Controls.Clear();
+            DisplayMain();
+        }
+
         /// <summary>
         /// ajoute toutes les textbox au panel info
         /// </summary>

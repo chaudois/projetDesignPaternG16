@@ -122,6 +122,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="contacts.ico" />
+    <None Include="Resources\return_left.bmp" />
+    <None Include="Ressources\arrow-return-left.png" />
     <Content Include="Ressources\Remove-icon.bmp" />
   </ItemGroup>
   <ItemGroup>
