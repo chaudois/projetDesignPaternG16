@@ -59,14 +59,5 @@ namespace DAL.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE IF NOT EXISTS &apos;contact&apos; (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, adresse TEXT,mail TEXT,phonenum TEXTE);.
-        /// </summary>
-        internal static string contactSQL {
-            get {
-                return ResourceManager.GetString("contactSQL", resourceCulture);
-            }
-        }
     }
 }

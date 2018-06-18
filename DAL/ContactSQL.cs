@@ -1,64 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using DTO;
 namespace DAL
 {
-    public class ContactSQL : SQLBase<ContactDTO>
+    public class ContactSQL : ISQLBase<ContactDTO>
     {
         public void Add(ContactDTO entity)
         {
-            using (SqliteManager sql = new SqliteManager())
+            SqlSingleton.getInstance().ExecQuery("insert into contact (firstname,lastname) values (" +
+            "'" + entity.firstName + "'," +
+            "'" + entity.lastName + "');");
+            DataTable dt = SqlSingleton.getInstance().ExecQuery(" select id from contact order by id desc limit 1 ;").Tables[0];
+            int id = int.Parse(dt.Rows[0]["id"].ToString());
+            foreach (var item in entity.fields)
             {
-                sql.ExecQuery("insert into contact (firstname,lastname,adresse,mail,phonenum) values (" +
-                    "'" + entity.firstName + "'," +
-                    "'" + entity.lastName + "'," +
-                    "'" + entity.adresse + "'," +
-                    "'" + entity.mail + "'," +
-                    "'" + entity.phoneNum + "');");
+                new FieldSQL().Add(new FieldDTO
+                {
+                    idContact = id,
+                    name = item.name,
+                    value = item.value
+                });
             }
+
         }
 
         public ContactDTO Get(int id)
         {
-            using (SqliteManager sql = new SqliteManager())
+            DataTable dt = SqlSingleton.getInstance().ExecQuery("select * from contact  where id=" + id + ";").Tables[0];
+            DataRow dr = dt.Rows[0];
+            ContactDTO retour = new ContactDTO
             {
-                DataTable dt = sql.ExecQuery("select * from contact where id=" + id + ";").Tables[0];
-                DataRow dr = dt.Rows[0];
-                return new ContactDTO
+                id = int.Parse(dr["id"].ToString()),
+                firstName = dr["firstname"].ToString(),
+                lastName = dr["lastname"].ToString()
+            };
+            dt = SqlSingleton.getInstance().ExecQuery("select * from field  where idContact=" + id + ";").Tables[0];
+            foreach (DataRow row in dt.Rows)
+            {
+                retour.fields.Add(new FieldDTO
                 {
-                    id = int.Parse(dr["id"].ToString()),
-                    firstName = dr["firstname"].ToString(),
-                    lastName = dr["lastname"].ToString(),
-                    mail = dr["mail"].ToString(),
-                    adresse = dr["adresse"].ToString(),
-                    phoneNum = dr["phoneNum"].ToString()
-                };
+                    idContact = int.Parse(row["idContact"].ToString()),
+                    name = row["name"].ToString(),
+                    value = row["value"].ToString(),
+                });
             }
+            return retour;
         }
 
         public IEnumerable<ContactDTO> GetAll()
         {
             var retour = new List<ContactDTO>();
-            using (SqliteManager sql = new SqliteManager())
+            List<FieldDTO> fieldOfCurrentReturn = new List<FieldDTO>();
+
+            DataTable dt = SqlSingleton.getInstance().ExecQuery("select * from contact  ;").Tables[0];
+            for (int i=0;i<dt.Rows.Count;i++)
             {
-                DataTable dt = sql.ExecQuery("select * from contact  ;").Tables[0];
+                retour.Add( new ContactDTO
+                {
+                    id = int.Parse(dt.Rows[i]["id"].ToString()),
+                    firstName = dt.Rows[i]["firstname"].ToString(),
+                    lastName = dt.Rows[i]["lastname"].ToString()
+                });
+                
+            }
+            foreach (var item in retour)
+            {
+
+                dt = SqlSingleton.getInstance().ExecQuery("select * from field  where idContact=" + item.id + ";").Tables[0];
                 foreach (DataRow row in dt.Rows)
                 {
-
-                    retour.Add(new ContactDTO
+                    item.fields.Add(new FieldDTO
                     {
-                        id = int.Parse(row["id"].ToString()),
-                        firstName = row["firstname"].ToString(),
-                        lastName = row["lastname"].ToString(),
-                        mail = row["mail"].ToString(),
-                        adresse = row["adresse"].ToString(),
-                        phoneNum = row["phoneNum"].ToString()
+                        idContact = item.id,
+                        name = row["name"].ToString(),
+                        value = row["value"].ToString(),
                     });
-
                 }
             }
             return retour;
@@ -66,22 +83,19 @@ namespace DAL
 
         public void remove(int id)
         {
-            using (SqliteManager sql = new SqliteManager())
-            {
-                sql.ExecQuery("delete from contact where id=" + id + ";");
-            }
+            SqlSingleton.getInstance().ExecQuery("delete from field where idContact=" + id + ";");
+
+            SqlSingleton.getInstance().ExecQuery("delete from contact where id=" + id + ";");
         }
 
         public void update(ContactDTO entity)
         {
-             using (SqliteManager sql = new SqliteManager())
+            SqlSingleton.getInstance().ExecQuery("update  contact set firstname='" + entity.firstName + "'" +
+               ",lastname='" + entity.lastName + "'" +
+               " where id=" + entity.id + ";");
+            foreach (var item in entity.fields)
             {
-                sql.ExecQuery("update  contact set firstname='" + entity.firstName + "'"+
-                    ",lastname='" + entity.lastName + "'" +
-                    ",adresse='" + entity.adresse + "'" +
-                    ",mail='" + entity.mail + "'" +
-                    ",phonenum='" + entity.phoneNum + "'" +
-                    " where id=" + entity.id + ";");
+                new FieldSQL().update(item);
             }
         }
     }

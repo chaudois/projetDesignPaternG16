@@ -9,7 +9,8 @@ namespace WinForm
     public partial class MainWindow : Form
     {
         private const int SPACE_BETWEEN_CONTROLS = 50;
-
+        private const int TEXT_INFO_WIDTH=70;
+        private SqliteManager SqliteManager = new SqliteManager();
 
         ContactSQL contactSQL = new ContactSQL();
         int nbControlsAddedMainPanel = 0;
@@ -46,56 +47,112 @@ namespace WinForm
                 mainPanel.Controls.Add(boutonName);
 
                 Button boutonRemove = new Button();
-                
-                boutonRemove.BackgroundImage= global::projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
+
+                boutonRemove.BackgroundImage = global::projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
                 boutonRemove.Size = new Size(new Point(25, 25));
                 boutonRemove.BackgroundImageLayout = ImageLayout.Stretch;
-                boutonRemove.Click += (s,e)=> { RemoveContact( item); };
-                
+                boutonRemove.Click += (s, e) => { RemoveContact(item); };
+
                 boutonRemove.Location = new Point(310, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
 
-                mainPanel.SetFlowBreak(boutonRemove,true);
+                mainPanel.SetFlowBreak(boutonRemove, true);
                 mainPanel.Controls.Add(boutonRemove);
                 nbControlsAddedMainPanel++;
- 
+
             }
             AddFormToMainPanel();
-
         }
         /// <summary>
         /// ajoute toutes les textbox au panel info
         /// </summary>
-        /// <param name="item">contact qui preremplira les textbox et qui sera update à l'appui du bouton</param>
-        private void DisplayInfo(ContactDTO item)
+        /// <param name="contact">contact qui preremplira les textbox et qui sera update à l'appui du bouton</param>
+        private void DisplayInfo(ContactDTO contact)
         {
             InfoPanel.Controls.Clear();
-            TextBox textBoxInfoFirstName = SetupTextBoxInfoPanel("FirstName");
-            TextBox textBoxInfoLastName = SetupTextBoxInfoPanel("LastName");
-            TextBox textBoxInfoAddress = SetupTextBoxInfoPanel("Adresse");
-            TextBox textBoxInfoMail = SetupTextBoxInfoPanel("Mail");
-            TextBox textBoxInfoTel = SetupTextBoxInfoPanel("Tel");
-
-            if (item.firstName != "") textBoxInfoFirstName.Text = item.firstName;
-            if (item.lastName != "") textBoxInfoLastName.Text = item.lastName;
-            if (item.mail != "") textBoxInfoMail.Text = item.mail;
-            if (item.phoneNum != "") textBoxInfoTel.Text = item.phoneNum;
-            if (item.adresse != "") textBoxInfoAddress.Text = item.adresse;
-
             Button boutonUpdate = new Button();
-            boutonUpdate.Text = "Mettre à jour";
+            TextBox boxNewName = SetupPlaceHolder("nouveau champ");
+            TextBox boxNewValue = new TextBox();
+            Button boutonAddField = new Button();
+
+            //ajoute les textbox qui contiendront les champs du contact, avec nom et prenom par default
+            Dictionary<string,TextBox> textBoxInfo = new Dictionary<string,TextBox>
+            {
+                {"FirstName", SetupTextBoxInfoPanel("FirstName",contact.firstName) },
+                {"LastName", SetupTextBoxInfoPanel("LastName",contact.lastName) }
+            };
+            foreach (var field in contact.fields)
+            {
+                textBoxInfo.Add(field.name,SetupTextBoxInfoPanel(field.name,field.value));
+            }
+
+            //creer et place les textbox d'ajout de champs pour ce contact
+
+            boxNewName.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            boxNewValue.Location = new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            InfoPanel.SetFlowBreak(boxNewValue,true);
+            nbControlsAddedInfoPanel++;
+            boxNewName.Hide();
+            boxNewValue.Hide();
+
+            boutonAddField.Text = "Ajouter";
+            boutonAddField.Location= new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            boutonAddField.Click += (e, s) =>
+            {
+                boxNewName.Show();
+                boxNewValue.Show();
+                boutonAddField.Hide();
+                nbControlsAddedInfoPanel++;
+
+                boutonUpdate.Location = new Point(TEXT_INFO_WIDTH * 2, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            };
+
+            InfoPanel.Controls.Add(boxNewName);
+            InfoPanel.Controls.Add(boxNewValue);
+            InfoPanel.Controls.Add(boutonAddField);
+
+
+            //creer et place le bouton qui enregistre les modif faites sur le contact
+            boutonUpdate.Text = "Enregistrer";
             boutonUpdate.AutoSize = true;
-            boutonUpdate.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            boutonUpdate.Location = new Point(TEXT_INFO_WIDTH*2, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             boutonUpdate.Click += (e, s) =>
             {
                 ContactDTO newContact = new ContactDTO
                 {
-                    id = item.id,
-                    firstName = textBoxInfoFirstName.Text == "FirstName" ? "" : textBoxInfoFirstName.Text,
-                    lastName = textBoxInfoLastName.Text == "LastName" ? "" : textBoxInfoLastName.Text,
-                    adresse = textBoxInfoAddress.Text == "Adresse" ? "" : textBoxInfoAddress.Text,
-                    mail = textBoxInfoMail.Text == "Mail" ? "" : textBoxInfoMail.Text,
-                    phoneNum = textBoxInfoTel.Text == "Tel" ? "" : textBoxInfoTel.Text
+                    id = contact.id,
+                    firstName = textBoxInfo["FirstName"].Text == "FirstName" ? "" : textBoxInfo["FirstName"].Text,
+                    lastName = textBoxInfo["LastName"].Text == "LastName" ? "" : textBoxInfo["LastName"].Text
                 };
+                foreach (var item in textBoxInfo.Keys) 
+                {
+                    if(item!="FirstName" && item != "LastName")
+                    {
+
+                        newContact.fields.Add(new FieldDTO
+                        {
+                            idContact = newContact.id,
+                            name = item,
+                            value = textBoxInfo[item].Text
+                        });
+                    }
+                }
+                if (boxNewValue.Text != "" && boxNewName.Text != "nouveau champ")
+                {
+                    newContact.fields.Add(new FieldDTO
+                    {
+                        idContact = newContact.id,
+                        name = boxNewName.Text,
+                        value = boxNewValue.Text
+                    });
+                    new FieldSQL().Add(new FieldDTO
+                    {
+                        idContact = newContact.id,
+                        name = boxNewName.Text,
+                        value = boxNewValue.Text
+                    });
+                }
+                
+
                 contactSQL.update(newContact);
                 mainPanel.Controls.Clear();
                 InfoPanel.Controls.Clear();
@@ -141,22 +198,35 @@ namespace WinForm
         /// <summary>
         /// creer et ajoute un textbox sur l'infoPanel
         /// </summary>
-        /// <param name="text">text à afficher sur le textbox</param>
+        /// <param name="name">text à afficher sur le textbox</param>
         /// <returns></returns>
-        private TextBox SetupTextBoxInfoPanel(string text)
+        private TextBox SetupTextBoxInfoPanel(string name, string value)
         {
-            TextBox textbox = SetupPlaceHolder(text);
-            textbox.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
-            nbControlsAddedInfoPanel++;
+            TextBox textbox = new TextBox();
+            Label label = new Label();
+
+            textbox.Text = value;
+            textbox.Name = name;
+            label.Text = name;
+            label.Width = TEXT_INFO_WIDTH;
+            label.AutoEllipsis = true;
+            label.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            textbox.Location = new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+
+
+            InfoPanel.Controls.Add(label);
             InfoPanel.Controls.Add(textbox);
+
+            nbControlsAddedInfoPanel++;
             InfoPanel.SetFlowBreak(textbox, true);
+
             return textbox;
         }
         /// <summary>
         /// supprime le contact de la base de donné et du panel
         /// </summary>
         /// <param name="item">contact à supprimer</param>
-        private void RemoveContact( ContactDTO item)
+        private void RemoveContact(ContactDTO item)
         {
             contactSQL.remove(item.id);
             mainPanel.Controls.Clear();
@@ -184,11 +254,11 @@ namespace WinForm
         private void AddFormToMainPanel()
         {
             TextBox textboxFirstName = setupTextBoxMainPanel("FirstName");
-            TextBox textboxLastName  = setupTextBoxMainPanel("LastName");
+            TextBox textboxLastName = setupTextBoxMainPanel("LastName");
             TextBox textboxAdresse = setupTextBoxMainPanel("Address");
             TextBox textboxMail = setupTextBoxMainPanel("Mail");
             TextBox textboxPhoneNum = setupTextBoxMainPanel("Tel");
-            
+
             Button boutonValider = new Button();
             boutonValider.Text = "Ajouter";
             boutonValider.Click += (bouton, args) =>
@@ -200,9 +270,23 @@ namespace WinForm
                       {
                           firstName = (textboxFirstName.Text != "FirstName" && textboxFirstName.Text != "") ? textboxFirstName.Text : "",
                           lastName = (textboxLastName.Text != "LastName" && textboxLastName.Text != "") ? textboxLastName.Text : "",
-                          adresse = (textboxAdresse.Text != "Address" && textboxFirstName.Text != "") ? textboxAdresse.Text : "",
-                          mail = (textboxMail.Text != "Mail" && textboxMail.Text != "") ? textboxMail.Text : "",
-                          phoneNum = (textboxPhoneNum.Text != "Tel" && textboxPhoneNum.Text != "") ? textboxPhoneNum.Text : ""
+                          fields = new List<FieldDTO>
+                          {
+                              new FieldDTO
+                              {
+                                  name="Adresse",
+                                  value=(textboxAdresse.Text != "Address" && textboxFirstName.Text != "") ? textboxAdresse.Text : ""
+                              },new FieldDTO
+                              {
+                                  name="Mail",
+                                  value= (textboxMail.Text != "Mail" && textboxMail.Text != "") ? textboxMail.Text : ""
+                              },new FieldDTO
+                              {
+                                  name="Tel",
+                                  value=(textboxPhoneNum.Text != "Tel" && textboxPhoneNum.Text != "") ? textboxPhoneNum.Text : ""
+                              }
+
+                          }
 
                       });
                       mainPanel.Controls.Clear();
@@ -210,7 +294,7 @@ namespace WinForm
                   }
               };
             mainPanel.Controls.Add(boutonValider);
- 
+
 
         }
     }

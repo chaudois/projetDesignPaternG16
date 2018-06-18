@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    interface SQLBase<T> where T: class
+    interface ISQLBase<T> where T: class
     {
+
         IEnumerable<T> GetAll();
         T Get(int id);
         void Add(T entity);

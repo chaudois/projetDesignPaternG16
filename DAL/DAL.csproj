@@ -59,15 +59,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContactSQL.cs" />
-    <Compile Include="Data.cs" />
+    <Compile Include="FieldSQL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SQLBase.cs" />
+    <Compile Include="ISQLBase.cs" />
     <Compile Include="SqliteManager.cs" />
+    <Compile Include="SqlSingleton.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

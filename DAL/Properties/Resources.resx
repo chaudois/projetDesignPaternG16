@@ -117,7 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="contactSQL" xml:space="preserve">
-    <value>CREATE TABLE IF NOT EXISTS 'contact' (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, adresse TEXT,mail TEXT,phonenum TEXTE);</value>
-  </data>
 </root>
