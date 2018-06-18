@@ -81,7 +81,7 @@ namespace DAL
             return retour;
         }
 
-        public void remove(int id)
+        public void remove(int id,string name)
         {
             SqlSingleton.getInstance().ExecQuery("delete from field where idContact=" + id + ";");
 

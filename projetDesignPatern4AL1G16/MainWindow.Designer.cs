@@ -92,6 +92,7 @@ namespace WinForm
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1043, 600);
             this.Controls.Add(this.tabControl1);
+            this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "Form1";
             this.Shown += new System.EventHandler(this.MainWindow_Shown);

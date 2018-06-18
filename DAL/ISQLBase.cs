@@ -13,6 +13,6 @@ namespace DAL
         T Get(int id);
         void Add(T entity);
         void update(T entity);
-        void remove(int id);
+        void remove(int id,string name);
     }
 }

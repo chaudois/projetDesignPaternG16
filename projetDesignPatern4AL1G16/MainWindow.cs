@@ -42,30 +42,30 @@ namespace WinForm
                 boutonName.Location = new Point(0, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
                 boutonName.Click += (e, s) =>
                 {
-                    DisplayInfo(item, boutonName);
+                    DisplayInfo(item.id, boutonName);
                 };
                 mainPanel.Controls.Add(boutonName);
 
-                Button boutonClone = new Button();
-                Button boutonRemove = new Button();
 
+                Button boutonClone = new Button();
                 boutonClone.BackgroundImage = projetDesignPatern4AL1G16.Properties.Resources.arrow_return_left;
                 boutonClone.Size = new Size(new Point(25, 25));
                 boutonClone.BackgroundImageLayout = ImageLayout.Stretch;
                 boutonClone.Click += (s, e) => { CloneContact(item); };
                 boutonClone.Anchor = AnchorStyles.Left;
+                boutonClone.Location = new Point(310, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
+                mainPanel.Controls.Add(boutonClone);
 
+                Button boutonRemove = new Button();
                 boutonRemove.BackgroundImage = projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
                 boutonRemove.Size = new Size(new Point(25, 25));
                 boutonRemove.BackgroundImageLayout = ImageLayout.Stretch;
                 boutonRemove.Click += (s, e) => { RemoveContact(item); };
                 boutonRemove.Anchor = AnchorStyles.Left;
-
-                boutonClone.Location = new Point(310, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
                 boutonRemove.Location = new Point(350, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
-
-                mainPanel.Controls.Add(boutonClone);
                 mainPanel.Controls.Add(boutonRemove);
+
+
 
                 mainPanel.SetFlowBreak(boutonRemove, true);
                 nbControlsAddedMainPanel++;
@@ -85,8 +85,9 @@ namespace WinForm
         /// ajoute toutes les textbox au panel info
         /// </summary>
         /// <param name="contact">contact qui preremplira les textbox et qui sera update à l'appui du bouton</param>
-        private void DisplayInfo(ContactDTO contact,Button origin)
+        private void DisplayInfo(int  idcontact,Button origin)
         {
+            ContactDTO contact = new ContactSQL().Get(idcontact);
             InfoPanel.Controls.Clear();
             Button boutonUpdate = new Button();
             TextBox boxNewName = SetupPlaceHolder("nouveau champ");
@@ -96,12 +97,21 @@ namespace WinForm
             //ajoute les textbox qui contiendront les champs du contact, avec nom et prenom par default
             Dictionary<string,TextBox> textBoxInfo = new Dictionary<string,TextBox>
             {
-                {"FirstName", SetupTextBoxInfoPanel("FirstName",contact.firstName) },
-                {"LastName", SetupTextBoxInfoPanel("LastName",contact.lastName) }
+                {"FirstName", SetupTextBoxInfoPanel(new FieldDTO{
+                        idContact =idcontact,
+                        name="FirstName",
+                        value=contact.firstName
+                    })
+                },{"LastName", SetupTextBoxInfoPanel(new FieldDTO{
+                        idContact =idcontact,
+                        name="LastName",
+                        value=contact.lastName
+                    })
+                }
             };
             foreach (var field in contact.fields)
             {
-                textBoxInfo.Add(field.name,SetupTextBoxInfoPanel(field.name,field.value));
+                textBoxInfo.Add(field.name,SetupTextBoxInfoPanel(field));
             }
 
             //creer et place les textbox d'ajout de champs pour ce contact
@@ -174,7 +184,7 @@ namespace WinForm
 
                 contactSQL.update(newContact);
                 InfoPanel.Controls.Clear();
-                DisplayInfo(newContact,null);
+                DisplayInfo(newContact.id,null);
                 if (origin != null)
                 {
                     origin.Text = newContact.firstName + " " + newContact.lastName;
@@ -221,25 +231,41 @@ namespace WinForm
         /// </summary>
         /// <param name="name">text à afficher sur le textbox</param>
         /// <returns></returns>
-        private TextBox SetupTextBoxInfoPanel(string name, string value)
+        private TextBox SetupTextBoxInfoPanel(FieldDTO field)
         {
             TextBox textbox = new TextBox();
             Label label = new Label();
 
-            textbox.Text = value;
-            textbox.Name = name;
-            label.Text = name;
+            textbox.Text = field.value;
+            textbox.Name = field.name;
+            label.Text = field.name;
             label.Width = TEXT_INFO_WIDTH;
             label.AutoEllipsis = true;
             label.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             textbox.Location = new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
 
 
+
+            Button boutonRemove = new Button();
+            boutonRemove.BackgroundImage = projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
+            boutonRemove.Size = new Size(new Point(25, 25));
+            boutonRemove.BackgroundImageLayout = ImageLayout.Stretch;
+            boutonRemove.Click += (s, e) => {
+                new FieldSQL().remove(field.idContact, field.name);
+                InfoPanel.Controls.Clear();
+                DisplayInfo(field.idContact,null);
+            };
+            boutonRemove.Anchor = AnchorStyles.Left;
+            boutonRemove.Location = new Point(TEXT_INFO_WIDTH*2, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
+
+
+
             InfoPanel.Controls.Add(label);
             InfoPanel.Controls.Add(textbox);
-
+            InfoPanel.Controls.Add(boutonRemove);
+            
             nbControlsAddedInfoPanel++;
-            InfoPanel.SetFlowBreak(textbox, true);
+            InfoPanel.SetFlowBreak(boutonRemove, true);
 
             return textbox;
         }
@@ -249,7 +275,7 @@ namespace WinForm
         /// <param name="item">contact à supprimer</param>
         private void RemoveContact(ContactDTO item)
         {
-            contactSQL.remove(item.id);
+            contactSQL.remove(item.id,null);
             mainPanel.Controls.Clear();
             InfoPanel.Controls.Clear();
             DisplayMain();
