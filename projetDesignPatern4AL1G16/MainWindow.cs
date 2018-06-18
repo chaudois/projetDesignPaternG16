@@ -42,7 +42,7 @@ namespace WinForm
                 boutonName.Location = new Point(0, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
                 boutonName.Click += (e, s) =>
                 {
-                    DisplayInfo(item);
+                    DisplayInfo(item, boutonName);
                 };
                 mainPanel.Controls.Add(boutonName);
 
@@ -66,7 +66,7 @@ namespace WinForm
         /// ajoute toutes les textbox au panel info
         /// </summary>
         /// <param name="contact">contact qui preremplira les textbox et qui sera update à l'appui du bouton</param>
-        private void DisplayInfo(ContactDTO contact)
+        private void DisplayInfo(ContactDTO contact,Button origin)
         {
             InfoPanel.Controls.Clear();
             Button boutonUpdate = new Button();
@@ -154,10 +154,12 @@ namespace WinForm
                 
 
                 contactSQL.update(newContact);
-                mainPanel.Controls.Clear();
                 InfoPanel.Controls.Clear();
-                DisplayInfo(newContact);
-                DisplayMain();
+                DisplayInfo(newContact,null);
+                if (origin != null)
+                {
+                    origin.Text = newContact.firstName + " " + newContact.lastName;
+                }
             };
             InfoPanel.Controls.Add(boutonUpdate);
 
