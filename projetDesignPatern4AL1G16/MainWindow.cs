@@ -95,27 +95,15 @@ namespace WinForm
             Button boutonAddField = new Button();
 
             //ajoute les textbox qui contiendront les champs du contact, avec nom et prenom par default
-            Dictionary<string,TextBox> textBoxInfo = new Dictionary<string,TextBox>
-            {
-                {"FirstName", SetupTextBoxInfoPanel(new FieldDTO{
-                        idContact =idcontact,
-                        name="FirstName",
-                        value=contact.firstName
-                    })
-                },{"LastName", SetupTextBoxInfoPanel(new FieldDTO{
-                        idContact =idcontact,
-                        name="LastName",
-                        value=contact.lastName
-                    })
-                }
-            };
-            foreach (var field in contact.fields)
+            Dictionary<string, TextBox> textBoxInfo = new Dictionary<string, TextBox>();
+
+
+            foreach (FieldDTO field in contact)
             {
                 textBoxInfo.Add(field.name,SetupTextBoxInfoPanel(field));
             }
 
             //creer et place les textbox d'ajout de champs pour ce contact
-
             boxNewName.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             boxNewValue.Location = new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             InfoPanel.SetFlowBreak(boxNewValue,true);
