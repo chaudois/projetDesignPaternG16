@@ -239,7 +239,7 @@ namespace WinForm
             boutonRemove.Size = new Size(new Point(25, 25));
             boutonRemove.BackgroundImageLayout = ImageLayout.Stretch;
             boutonRemove.Click += (s, e) => {
-                new FieldSQL().remove(field.idContact, field.name);
+                new FieldSQL().remove(field);
                 InfoPanel.Controls.Clear();
                 DisplayInfo(field.idContact,null);
             };
@@ -263,7 +263,7 @@ namespace WinForm
         /// <param name="item">contact à supprimer</param>
         private void RemoveContact(ContactDTO item)
         {
-            contactSQL.remove(item.id,null);
+            contactSQL.remove(item );
             mainPanel.Controls.Clear();
             InfoPanel.Controls.Clear();
             DisplayMain();

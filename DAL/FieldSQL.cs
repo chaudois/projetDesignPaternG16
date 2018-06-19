@@ -49,9 +49,9 @@ namespace DAL
             return retour;
         }
 
-        public void remove(int id,string name)
+        public void remove(FieldDTO field)
         {
-            SqlSingleton.getInstance().ExecQuery("delete from field where idcontact ="+id+" and name='" + name + "';");
+            SqlSingleton.getInstance().ExecQuery("delete from field where idcontact ="+ field.idContact + " and name='" + field.name + "';");
         }
 
         public void update(FieldDTO entity)
