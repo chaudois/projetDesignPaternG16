@@ -35,8 +35,10 @@ namespace WinForm
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.panelExport = new System.Windows.Forms.FlowLayoutPanel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainPanel
@@ -63,6 +65,8 @@ namespace WinForm
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1019, 576);
             this.tabControl1.TabIndex = 2;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControl1.Enter += new System.EventHandler(this.tabControl1_Enter);
             // 
             // tabPage1
             // 
@@ -78,6 +82,7 @@ namespace WinForm
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.panelExport);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -85,6 +90,13 @@ namespace WinForm
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Import/Export";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // panelExport
+            // 
+            this.panelExport.Location = new System.Drawing.Point(6, 6);
+            this.panelExport.Name = "panelExport";
+            this.panelExport.Size = new System.Drawing.Size(999, 535);
+            this.panelExport.TabIndex = 0;
             // 
             // MainWindow
             // 
@@ -97,9 +109,9 @@ namespace WinForm
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "Kontact";
-            this.Shown += new System.EventHandler(this.MainWindow_Shown);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -111,6 +123,7 @@ namespace WinForm
         private TabControl tabControl1;
         private TabPage tabPage1;
         private TabPage tabPage2;
+        private FlowLayoutPanel panelExport;
     }
 }
 

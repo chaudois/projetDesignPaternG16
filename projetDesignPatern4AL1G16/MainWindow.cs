@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using DAL;
 using DTO;
+using Newtonsoft.Json;
+
 namespace WinForm
 {
     public partial class MainWindow : Form
     {
         private const int SPACE_BETWEEN_CONTROLS = 50;
-        private const int TEXT_INFO_WIDTH=70;
+        private const int TEXT_INFO_WIDTH = 70;
         private SqliteManager SqliteManager = new SqliteManager();
-
+        private List<CheckBox> checkBox = new List<CheckBox>();
         ContactSQL contactSQL = new ContactSQL();
         int nbControlsAddedMainPanel = 0;
         int nbControlsAddedInfoPanel = 0;
@@ -20,15 +23,13 @@ namespace WinForm
             InitializeComponent();
         }
 
-        private void MainWindow_Shown(object sender, EventArgs e)
-        {
-            DisplayMain();
-        }
+
         /// <summary>
         /// ajoute tout les contact contenues en base au main panel ainsi que le formualire d'ajout
         /// </summary>
         private void DisplayMain()
         {
+            mainPanel.Controls.Clear();
             var contacts = contactSQL.GetAll();
 
             foreach (var item in contacts)//ajoute tout les contact à la fenetre principal
@@ -73,10 +74,91 @@ namespace WinForm
             }
             AddFormToMainPanel();
         }
+        private void DisplayExportImport()
+        {
+            panelExport.Controls.Clear();
+            var contacts = contactSQL.GetAll();
+            foreach (var item in contacts)//ajoute tout les contact à la fenetre principal
+            {
 
+                CheckBox wantToExport = new CheckBox();
+                wantToExport.Text = "";
+                wantToExport.Size = new Size(20, 20);
+                wantToExport.Name = item.id.ToString();
+                checkBox.Add(wantToExport);
+
+                Label labelName = new Label();
+                labelName.Text = item.firstName + " " + item.lastName;
+                labelName.Anchor = AnchorStyles.Left;
+                labelName.Margin = new Padding(0, 3, 3, 3);
+
+
+                panelExport.Controls.Add(wantToExport);
+                panelExport.Controls.Add(labelName);
+
+                panelExport.SetFlowBreak(labelName, true);
+                nbControlsAddedMainPanel++;
+
+            }
+
+            Button buttonExport = new Button();
+            buttonExport.Text = "Exporter";
+            buttonExport.Click += (e, s) =>
+            {
+                List<ContactDTO> listToExport = new List<ContactDTO>();
+                foreach (var CB in checkBox)
+                {
+                    if (CB.Checked)
+                    {
+                        listToExport.Add(new ContactSQL().Get(int.Parse(CB.Name)));
+                    }
+                }
+                string output = "[";
+                foreach (ContactDTO contact in listToExport)
+                {
+                    output += contact.jsonify();
+                    output += ",";
+                }
+                output = output.Remove(output.Length - 1, 1);
+                output += "]";
+
+                string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                path += "/export-";
+                path += DateTime.Now.ToString("dd-MM-yyyy");
+                path += ".txt";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path))
+                {
+                    file.Write(output);
+                    Process.Start(path);
+                }
+
+            };
+
+            Button buttonImport = new Button();
+            buttonImport.Click += (e, s) =>
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    using (System.IO.StreamReader sr = new System.IO.StreamReader(openFileDialog.FileName))
+                    {
+                        string importedData = sr.ReadToEnd();
+                        var result = JsonConvert.DeserializeObject<List<ContactDTO>>(importedData);
+                        foreach (var item in result)
+                        {
+                            new ContactSQL().Add(item);
+                        }
+                    }
+                }
+            };
+            buttonImport.Text = "Importer";
+
+            panelExport.Controls.Add(buttonExport);
+            panelExport.Controls.Add(buttonImport);
+        }
         private void CloneContact(ContactDTO item)
         {
-            new ContactSQL().Add((ContactDTO) item.Clone());
+            new ContactSQL().Add((ContactDTO)item.Clone());
             mainPanel.Controls.Clear();
             DisplayMain();
         }
@@ -85,7 +167,7 @@ namespace WinForm
         /// ajoute toutes les textbox au panel info
         /// </summary>
         /// <param name="contact">contact qui preremplira les textbox et qui sera update à l'appui du bouton</param>
-        private void DisplayInfo(int  idcontact,Button origin)
+        private void DisplayInfo(int idcontact, Button origin)
         {
             ContactDTO contact = new ContactSQL().Get(idcontact);
             InfoPanel.Controls.Clear();
@@ -100,19 +182,19 @@ namespace WinForm
 
             foreach (FieldDTO field in contact)
             {
-                textBoxInfo.Add(field.name,SetupTextBoxInfoPanel(field));
+                textBoxInfo.Add(field.name, SetupTextBoxInfoPanel(field));
             }
 
             //creer et place les textbox d'ajout de champs pour ce contact
             boxNewName.Location = new Point(0, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             boxNewValue.Location = new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
-            InfoPanel.SetFlowBreak(boxNewValue,true);
+            InfoPanel.SetFlowBreak(boxNewValue, true);
             nbControlsAddedInfoPanel++;
             boxNewName.Hide();
             boxNewValue.Hide();
 
             boutonAddField.Text = "Ajouter";
-            boutonAddField.Location= new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            boutonAddField.Location = new Point(TEXT_INFO_WIDTH, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             boutonAddField.Click += (e, s) =>
             {
                 boxNewName.Show();
@@ -131,7 +213,7 @@ namespace WinForm
             //creer et place le bouton qui enregistre les modif faites sur le contact
             boutonUpdate.Text = "Enregistrer";
             boutonUpdate.AutoSize = true;
-            boutonUpdate.Location = new Point(TEXT_INFO_WIDTH*2, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
+            boutonUpdate.Location = new Point(TEXT_INFO_WIDTH * 2, nbControlsAddedInfoPanel * SPACE_BETWEEN_CONTROLS);
             boutonUpdate.Click += (e, s) =>
             {
                 ContactDTO newContact = new ContactDTO
@@ -140,9 +222,9 @@ namespace WinForm
                     firstName = textBoxInfo["FirstName"].Text == "FirstName" ? "" : textBoxInfo["FirstName"].Text,
                     lastName = textBoxInfo["LastName"].Text == "LastName" ? "" : textBoxInfo["LastName"].Text
                 };
-                foreach (var item in textBoxInfo.Keys) 
+                foreach (var item in textBoxInfo.Keys)
                 {
-                    if(item!="FirstName" && item != "LastName")
+                    if (item != "FirstName" && item != "LastName")
                     {
 
                         newContact.fields.Add(new FieldDTO
@@ -168,11 +250,11 @@ namespace WinForm
                         value = boxNewValue.Text
                     });
                 }
-                
+
 
                 contactSQL.update(newContact);
                 InfoPanel.Controls.Clear();
-                DisplayInfo(newContact.id,null);
+                DisplayInfo(newContact.id, null);
                 if (origin != null)
                 {
                     origin.Text = newContact.firstName + " " + newContact.lastName;
@@ -238,20 +320,21 @@ namespace WinForm
             boutonRemove.BackgroundImage = projetDesignPatern4AL1G16.Properties.Resources.Remove_icon;
             boutonRemove.Size = new Size(new Point(25, 25));
             boutonRemove.BackgroundImageLayout = ImageLayout.Stretch;
-            boutonRemove.Click += (s, e) => {
+            boutonRemove.Click += (s, e) =>
+            {
                 new FieldSQL().remove(field);
                 InfoPanel.Controls.Clear();
-                DisplayInfo(field.idContact,null);
+                DisplayInfo(field.idContact, null);
             };
             boutonRemove.Anchor = AnchorStyles.Left;
-            boutonRemove.Location = new Point(TEXT_INFO_WIDTH*2, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
+            boutonRemove.Location = new Point(TEXT_INFO_WIDTH * 2, SPACE_BETWEEN_CONTROLS * nbControlsAddedMainPanel);
 
 
 
             InfoPanel.Controls.Add(label);
             InfoPanel.Controls.Add(textbox);
             InfoPanel.Controls.Add(boutonRemove);
-            
+
             nbControlsAddedInfoPanel++;
             InfoPanel.SetFlowBreak(boutonRemove, true);
 
@@ -263,7 +346,7 @@ namespace WinForm
         /// <param name="item">contact à supprimer</param>
         private void RemoveContact(ContactDTO item)
         {
-            contactSQL.remove(item );
+            contactSQL.remove(item);
             mainPanel.Controls.Clear();
             InfoPanel.Controls.Clear();
             DisplayMain();
@@ -331,6 +414,24 @@ namespace WinForm
             mainPanel.Controls.Add(boutonValider);
 
 
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs eve)
+        {
+            if (tabControl1.SelectedIndex == 0)
+            {
+                DisplayMain();
+
+            }
+            else
+            {
+                DisplayExportImport();
+            }
+        }
+
+        private void tabControl1_Enter(object sender, EventArgs e)
+        {
+            DisplayMain();
         }
     }
 }
