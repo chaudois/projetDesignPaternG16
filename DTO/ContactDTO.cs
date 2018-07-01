@@ -74,23 +74,6 @@ namespace DTO
         {
             cpt = 0;
         }
-
-        public string jsonify()
-        {
-            string retour= "{\"firstName\":\"" + firstName + "\",";
-            retour += "\"lastName\":\"" + lastName + "\",\"fields\":[";
-            foreach (var item in fields)
-            {
-                retour += item.jsonify();
-                retour += ",";
-            }
-            if (retour[retour.Length - 1] == ',')
-            {
-                retour = retour.Remove(retour.Length - 1, 1);
-            }
-
-            retour += "]}";
-            return retour;
-        }
+         
     }
 }

@@ -55,6 +55,7 @@ namespace WinForm
             this.InfoPanel.Name = "InfoPanel";
             this.InfoPanel.Size = new System.Drawing.Size(379, 535);
             this.InfoPanel.TabIndex = 1;
+            this.InfoPanel.AutoScroll = true;
             // 
             // tabControl1
             // 
@@ -97,6 +98,7 @@ namespace WinForm
             this.panelExport.Name = "panelExport";
             this.panelExport.Size = new System.Drawing.Size(999, 535);
             this.panelExport.TabIndex = 0;
+            this.panelExport.AutoScroll = true;
             // 
             // MainWindow
             // 

@@ -61,9 +61,6 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -124,7 +121,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="contacts.ico" />
-    <None Include="Resources\return_left.bmp" />
     <None Include="Ressources\arrow-return-left.png" />
     <Content Include="Ressources\Remove-icon.bmp" />
   </ItemGroup>
@@ -141,6 +137,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BO\BO.csproj">
+      <Project>{f95ab0a7-ad93-4142-9cf7-b85959d9e043}</Project>
+      <Name>BO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DAL\DAL.csproj">
       <Project>{642e9334-23e9-47d3-8f96-733e07ae5ae7}</Project>
       <Name>DAL</Name>

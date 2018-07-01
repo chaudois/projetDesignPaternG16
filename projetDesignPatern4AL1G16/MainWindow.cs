@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using DAL;
 using DTO;
-using Newtonsoft.Json;
+using BO;
 
 namespace WinForm
 {
@@ -101,9 +101,10 @@ namespace WinForm
 
             }
 
-            Button buttonExport = new Button();
-            buttonExport.Text = "Exporter";
-            buttonExport.Click += (e, s) =>
+            Button buttonExportJSON = new Button();
+            buttonExportJSON.Text = "Exporter JSON";
+            buttonExportJSON.AutoSize = true;
+            buttonExportJSON.Click += (e, s) =>
             {
                 List<ContactDTO> listToExport = new List<ContactDTO>();
                 foreach (var CB in checkBox)
@@ -113,24 +114,24 @@ namespace WinForm
                         listToExport.Add(new ContactSQL().Get(int.Parse(CB.Name)));
                     }
                 }
-                string output = "[";
-                foreach (ContactDTO contact in listToExport)
-                {
-                    output += contact.jsonify();
-                    output += ",";
-                }
-                output = output.Remove(output.Length - 1, 1);
-                output += "]";
+                new Export(new JSONWork(), listToExport).ExportContact();
+ 
+            };
 
-                string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                path += "/export-";
-                path += DateTime.Now.ToString("dd-MM-yyyy");
-                path += ".txt";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path))
+            Button buttonExportCSV = new Button();
+            buttonExportCSV.Text = "Exporter CSV";
+            buttonExportCSV.AutoSize = true;
+            buttonExportCSV.Click += (e, s) =>
+            {
+                List<ContactDTO> listToExport = new List<ContactDTO>();
+                foreach (var CB in checkBox)
                 {
-                    file.Write(output);
-                    Process.Start(path);
+                    if (CB.Checked) 
+                    {
+                        listToExport.Add(new ContactSQL().Get(int.Parse(CB.Name)));
+                    }
                 }
+                new Export(new CSVWork(), listToExport).ExportContact();
 
             };
 
@@ -138,22 +139,24 @@ namespace WinForm
             buttonImport.Click += (e, s) =>
             {
                 OpenFileDialog openFileDialog = new OpenFileDialog();
-                if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     using (System.IO.StreamReader sr = new System.IO.StreamReader(openFileDialog.FileName))
                     {
-                        string importedData = sr.ReadToEnd();
-                        var result = JsonConvert.DeserializeObject<List<ContactDTO>>(importedData);
+                        string dataToImport = sr.ReadToEnd();
+                        List<ContactDTO> result = new Import(dataToImport).ImportContact();
                         foreach (var item in result)
                         {
                             new ContactSQL().Add(item);
                         }
                     }
                 }
+                DisplayExportImport();
             };
             buttonImport.Text = "Importer";
 
-            panelExport.Controls.Add(buttonExport);
+            panelExport.Controls.Add(buttonExportJSON);
+            panelExport.Controls.Add(buttonExportCSV);
             panelExport.Controls.Add(buttonImport);
         }
         private void CloneContact(ContactDTO item)
@@ -182,7 +185,15 @@ namespace WinForm
 
             foreach (FieldDTO field in contact)
             {
-                textBoxInfo.Add(field.name, SetupTextBoxInfoPanel(field));
+                try
+                {
+                    textBoxInfo.Add(field.name, SetupTextBoxInfoPanel(field));
+
+                }
+                catch
+                {
+
+                }
             }
 
             //creer et place les textbox d'ajout de champs pour ce contact
